@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职途星盘 · 性格与就业测评</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --accent: #c84b31;
+    --gold: #d4a853;
+    --teal: #2d7d7d;
+    --mist: #e8e0d0;
+    --shadow: rgba(26,26,46,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Washi paper texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Decorative brush strokes */
+  .bg-brush {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-brush-1 { width: 500px; height: 500px; background: var(--teal); top: -100px; right: -100px; }
+  .bg-brush-2 { width: 400px; height: 400px; background: var(--accent); bottom: -80px; left: -80px; }
+  .bg-brush-3 { width: 300px; height: 300px; background: var(--gold); top: 50%; left: 40%; }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header-badge {
+    display: inline-block;
+    border: 1.5px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 4px;
+    padding: 4px 16px;
+    margin-bottom: 16px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .header h1 {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .header h1 span { color: var(--accent); }
+
+  .header-sub {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+
+  /* ===== PROGRESS ===== */
+  .progress-bar-wrap {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px;
+    animation: fadeIn 0.5s ease both;
+  }
+
+  .progress-track {
+    flex: 1; height: 3px;
+    background: var(--mist);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-text {
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+  }
+
+  /* ===== SECTION HEADER ===== */
+  .section-label {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .section-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ===== QUESTION CARD ===== */
+  .question-card {
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212,168,83,0.25);
+    border-radius: 2px;
+    padding: 36px 40px;
+    margin-bottom: 20px;
+    box-shadow: 4px 4px 0 rgba(212,168,83,0.12), 0 8px 32px var(--shadow);
+    animation: slideUp 0.5s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--teal), var(--gold));
+  }
+
+  .question-number {
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .question-text {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(16px, 3vw, 20px);
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  /* ===== OPTIONS ===== */
+  .options-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .option-btn {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 18px;
+    background: transparent;
+    border: 1px solid var(--mist);
+    border-radius: 1px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s ease;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.5;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--teal);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .option-btn:hover {
+    border-color: var(--teal);
+    transform: translateX(4px);
+  }
+
+  .option-btn:hover::after { opacity: 0.04; }
+
+  .option-btn.selected {
+    border-color: var(--teal);
+    background: rgba(45,125,125,0.08);
+  }
+
+  .option-btn.selected .opt-marker {
+    background: var(--teal);
+    color: white;
+    border-color: var(--teal);
+  }
+
+  .opt-marker {
+    min-width: 24px; height: 24px;
+    border: 1.5px solid var(--mist);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #aaa;
+    transition: all 0.2s;
+    margin-top: 1px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  /* ===== SCALE OPTIONS ===== */
+  .scale-wrap {
+    display: flex; gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .scale-label {
+    font-size: 12px;
+    color: #aaa;
+    white-space: nowrap;
+  }
+
+  .scale-btns {
+    display: flex; gap: 6px;
+  }
+
+  .scale-btn {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--mist);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #999;
+    transition: all 0.2s;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .scale-btn:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.1); }
+  .scale-btn.selected { background: var(--teal); border-color: var(--teal); color: white; transform: scale(1.1); }
+
+  /* ===== NAV BUTTONS ===== */
+  .nav-wrap {
+    display: flex; gap: 12px;
+    margin-top: 24px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 12px 32px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    border-radius: 1px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--mist);
+    color: #999;
+  }
+
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 3px 3px 0 var(--gold);
+  }
+
+  .btn-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--gold);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4; cursor: not-allowed;
+    transform: none; box-shadow: 3px 3px 0 var(--gold);
+  }
+
+  /* ===== RESULT PAGE ===== */
+  .result-page {
+    animation: fadeIn 0.8s ease both;
+  }
+
+  .result-hero {
+    text-align: center;
+    padding: 40px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(212,168,83,0.3);
+    box-shadow: 5px 5px 0 rgba(212,168,83,0.2), 0 8px 40px var(--shadow);
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: attr(data-char);
+    position: absolute;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 180px;
+    font-weight: 700;
+    color: var(--teal);
+    opacity: 0.05;
+    right: -20px;
+    top: -20px;
+    line-height: 1;
+  }
+
+  .result-type-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    font-family: 'Noto Serif SC', serif;
+    margin-bottom: 8px;
+  }
+
+  .result-type-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .result-type-en {
+    font-size: 13px;
+    color: #aaa;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+  }
+
+  .result-quote {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    color: var(--teal);
+    line-height: 1.8;
+    max-width: 480px;
+    margin: 0 auto;
+    border-left: 2px solid var(--gold);
+    padding-left: 16px;
+    text-align: left;
+  }
+
+  /* ===== RESULT SECTIONS ===== */
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 540px) { .result-grid { grid-template-columns: 1fr; } }
+
+  .result-card {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(212,168,83,0.2);
+    padding: 24px;
+    box-shadow: 3px 3px 0 rgba(212,168,83,0.1);
+    animation: slideUp 0.6s ease both;
+  }
+
+  .result-card:nth-child(2) { animation-delay: 0.1s; }
+  .result-card:nth-child(3) { animation-delay: 0.2s; }
+  .result-card:nth-child(4) { animation-delay: 0.3s; }
+
+  .result-card-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .result-card-title::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* ===== RADAR CHART ===== */
+  .radar-wrap {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(212,168,83,0.2);
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 3px 3px 0 rgba(212,168,83,0.1);
+    text-align: center;
+    animation: slideUp 0.6s 0.15s ease both;
+  }
+
+  .radar-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .radar-title::before { content: ''; width: 20px; height: 1px; background: var(--accent); }
+
+  canvas#radarChart {
+    max-width: 280px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* ===== ANXIETY METER ===== */
+  .anxiety-meter {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(212,168,83,0.2);
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 3px 3px 0 rgba(212,168,83,0.1);
+    animation: slideUp 0.6s 0.2s ease both;
+  }
+
+  .anxiety-bar-track {
+    height: 8px;
+    background: var(--mist);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0 8px;
+  }
+
+  .anxiety-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .anxiety-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #bbb;
+  }
+
+  .anxiety-score-display {
+    display: flex; align-items: baseline; gap: 6px;
+    margin: 8px 0;
+  }
+
+  .anxiety-score-num {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .anxiety-score-unit { font-size: 14px; color: #aaa; }
+
+  /* ===== TAG LIST ===== */
+  .tag-list {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+
+  .tag {
+    padding: 4px 12px;
+    border: 1px solid currentColor;
+    font-size: 12px;
+    border-radius: 1px;
+    letter-spacing: 1px;
+  }
+
+  .tag-teal { color: var(--teal); }
+  .tag-gold { color: var(--gold); }
+  .tag-accent { color: var(--accent); }
+
+  /* ===== ADVICE LIST ===== */
+  .advice-list {
+    list-style: none;
+    display: grid; gap: 10px;
+  }
+
+  .advice-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+  }
+
+  .advice-list li::before {
+    content: '→';
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== SHARE / RESTART ===== */
+  .result-actions {
+    display: flex; gap: 12px; justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== INTRO PAGE ===== */
+  .intro-page {
+    animation: fadeIn 0.8s ease both;
+  }
+
+  .intro-hero {
+    text-align: center;
+    padding: 60px 40px 50px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(212,168,83,0.25);
+    box-shadow: 5px 5px 0 rgba(212,168,83,0.15), 0 8px 40px var(--shadow);
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .intro-emblem {
+    width: 72px; height: 72px;
+    margin: 0 auto 20px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    color: var(--gold);
+    position: relative;
+  }
+
+  .intro-emblem::before, .intro-emblem::after {
+    content: '';
+    position: absolute;
+    border: 1px solid rgba(212,168,83,0.3);
+    border-radius: 50%;
+  }
+
+  .intro-emblem::before { inset: -8px; }
+  .intro-emblem::after { inset: -16px; }
+
+  .intro-desc {
+    font-size: 14px;
+    color: #777;
+    line-height: 1.9;
+    max-width: 480px;
+    margin: 16px auto 0;
+  }
+
+  .intro-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--mist);
+    margin-bottom: 28px;
+    border: 1px solid var(--mist);
+  }
+
+  .intro-stat {
+    background: rgba(255,255,255,0.8);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .intro-stat-num {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--teal);
+    display: block;
+  }
+
+  .intro-stat-label {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 4px;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hidden { display: none !important; }
+
+  /* ===== PHASE HEADER ===== */
+  .phase-header {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--ink);
+    color: var(--paper);
+    animation: slideUp 0.4s ease both;
+  }
+
+  .phase-icon { font-size: 20px; }
+
+  .phase-info { flex: 1; }
+
+  .phase-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .phase-desc {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-brush bg-brush-1"></div>
+<div class="bg-brush bg-brush-2"></div>
+<div class="bg-brush bg-brush-3"></div>
+
+<div class="container">
+
+  <!-- ===== INTRO PAGE ===== -->
+  <div id="introPage" class="intro-page">
+    <div class="header">
+      <div class="header-badge">职途星盘</div>
+      <h1>探索你的<span>职途密码</span></h1>
+      <p class="header-sub">性格特征 × 就业焦虑 · 综合测评</p>
+    </div>
+
+    <div class="intro-hero">
+      <div class="intro-emblem">盘</div>
+      <p class="intro-desc">
+        这是一个结合心理学理论设计的测评小游戏。<br>
+        通过 <strong>15道</strong> 精心设计的情景题目，<br>
+        帮你了解自己的性格特征与就业焦虑状态，<br>
+        并给出个性化的职场发展建议。
+      </p>
+    </div>
+
+    <div class="intro-stats">
+      <div class="intro-stat">
+        <span class="intro-stat-num">15</span>
+        <div class="intro-stat-label">道题目</div>
+      </div>
+      <div class="intro-stat">
+        <span class="intro-stat-num">5</span>
+        <div class="intro-stat-label">分钟完成</div>
+      </div>
+      <div class="intro-stat">
+        <span class="intro-stat-num">8</span>
+        <div class="intro-stat-label">种性格类型</div>
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <button class="btn btn-primary" onclick="startGame()" style="font-size:16px;padding:16px 48px;letter-spacing:4px">
+        开始探索 →
+      </button>
+      <p style="margin-top:16px;font-size:12px;color:#bbb">结果仅供参考，请根据实际情况作答</p>
+    </div>
+  </div>
+
+  <!-- ===== GAME PAGE ===== -->
+  <div id="gamePage" class="hidden">
+    <div class="header" style="margin-bottom:28px">
+      <div class="header-badge">职途星盘</div>
+      <h1>职途<span>测评</span></h1>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <span class="progress-text" id="progressText">0 / 15</span>
+    </div>
+
+    <div id="phaseHeader" class="phase-header">
+      <span class="phase-icon">🌱</span>
+      <div class="phase-info">
+        <div class="phase-name" id="phaseName">第一章：性格探索</div>
+        <div class="phase-desc" id="phaseDesc">了解你的行为倾向与思维方式</div>
+      </div>
+    </div>
+
+    <div id="questionArea"></div>
+
+    <div class="nav-wrap">
+      <button class="btn btn-outline" id="prevBtn" onclick="navigate(-1)">← 上一题</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="navigate(1)" disabled>下一题 →</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULT PAGE ===== -->
+  <div id="resultPage" class="result-page hidden"></div>
+
+</div>
+
+<script>
+// =====================================================
+// DATA
+// =====================================================
+
+const QUESTIONS = [
+  // === PHASE 1: 性格特征 (Q1-9) ===
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'EI', // Extraversion/Introversion
+    text: '周末突然有了整段空闲时间，你最想做的是？',
+    options: [
+      { text: '约上朋友聚会、出去走走，人多才有活力', value: 'E', score: { E: 2 } },
+      { text: '随机加入某个陌生的社群活动，说不定有惊喜', value: 'E', score: { E: 1 } },
+      { text: '窝在家里看书、刷剧或独自探索一个爱好', value: 'I', score: { I: 2 } },
+      { text: '先一个人待着，如果心情好再看看有没有人邀约', value: 'I', score: { I: 1 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'SN', // Sensing/Intuition
+    text: '面对一个全新的项目，你通常会怎么开始？',
+    options: [
+      { text: '先收集大量资料和数据，弄清楚现状再规划', value: 'S', score: { S: 2 } },
+      { text: '按照以往成熟的步骤，一步一步稳扎稳打', value: 'S', score: { S: 1 } },
+      { text: '先想象项目完成后的样子，然后倒推怎么实现', value: 'N', score: { N: 2 } },
+      { text: '头脑风暴，随时有灵感就记下来，边做边调整', value: 'N', score: { N: 1 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'TF', // Thinking/Feeling
+    text: '朋友做了一个决定，你觉得不太明智。你会？',
+    options: [
+      { text: '直接指出问题，分析利弊，帮他看清风险', value: 'T', score: { T: 2 } },
+      { text: '问清楚他的想法后，提出自己的合理建议', value: 'T', score: { T: 1 } },
+      { text: '先鼓励他，然后温和地聊聊你的顾虑', value: 'F', score: { F: 1 } },
+      { text: '他已经决定了，就全力支持，陪他一起走', value: 'F', score: { F: 2 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'JP', // Judging/Perceiving
+    text: '你对"计划"的态度更接近哪种？',
+    options: [
+      { text: '喜欢提前制定详细计划，按计划执行很踏实', value: 'J', score: { J: 2 } },
+      { text: '会做计划，但允许自己偶尔偏离', value: 'J', score: { J: 1 } },
+      { text: '计划是用来打破的，灵活应变才是我的风格', value: 'P', score: { P: 2 } },
+      { text: '简单列个方向就好，太详细反而觉得被束缚', value: 'P', score: { P: 1 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'RI', // Resilience
+    text: '遇到连续的挫折和失败，你通常的状态是？',
+    options: [
+      { text: '短暂沮丧，但很快能重新振作、找到出路', value: 'HR', score: { R: 2 } },
+      { text: '需要一些时间消化，但总能想到办法继续', value: 'HR', score: { R: 1 } },
+      { text: '挫折会让我怀疑自己，需要很长时间调整', value: 'LR', score: { R: -1 } },
+      { text: '失败后很难找回状态，甚至影响后续表现', value: 'LR', score: { R: -2 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'scale',
+    dimension: 'Openness',
+    text: '我愿意尝试完全陌生的领域，就算不确定结果',
+    scaleLabels: ['完全不符合', '完全符合'],
+  },
+  {
+    phase: 1,
+    type: 'scale',
+    dimension: 'Conscientiousness',
+    text: '我通常能在截止日期前完成任务，并保持高质量',
+    scaleLabels: ['完全不符合', '完全符合'],
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'Goal',
+    text: '你认为理想工作最重要的是？',
+    options: [
+      { text: '高薪酬与物质保障', value: 'G1', score: { Stable: 2 } },
+      { text: '稳定、安全、风险低', value: 'G2', score: { Stable: 1 } },
+      { text: '成长空间与挑战性', value: 'G3', score: { Growth: 2 } },
+      { text: '自由度高、有创造空间', value: 'G4', score: { Growth: 1 } },
+    ]
+  },
+  {
+    phase: 1,
+    type: 'choice',
+    dimension: 'Social',
+    text: '团队合作中，你更自然地扮演哪个角色？',
+    options: [
+      { text: '带头人：主动提方向，推动进度', value: 'Leader', score: { Leader: 2 } },
+      { text: '协调者：让团队氛围顺畅，解决矛盾', value: 'Coordinator', score: { Leader: 1 } },
+      { text: '执行者：做好分配的任务，专注细节', value: 'Executor', score: { Leader: 0 } },
+      { text: '创意者：提供新想法，但不擅长推进', value: 'Creative', score: { Creative: 2 } },
+    ]
+  },
+
+  // === PHASE 2: 就业焦虑 (Q10-15) ===
+  {
+    phase: 2,
+    type: 'scale',
+    dimension: 'Anxiety_Future',
+    text: '想到毕业后的就业前景，我感到很焦虑或不安',
+    scaleLabels: ['完全不焦虑', '非常焦虑'],
+  },
+  {
+    phase: 2,
+    type: 'scale',
+    dimension: 'Anxiety_Compete',
+    text: '看到同学找到好工作或实习，我会感到压力或自我怀疑',
+    scaleLabels: ['完全没有', '非常明显'],
+  },
+  {
+    phase: 2,
+    type: 'choice',
+    dimension: 'Anxiety_Action',
+    text: '面对就业压力，你目前的行动状态是？',
+    options: [
+      { text: '已有明确目标，在积极准备和行动中', value: 'A1', score: { ActionScore: 0 } },
+      { text: '方向大致清楚，但执行有些拖延', value: 'A2', score: { ActionScore: 1 } },
+      { text: '方向模糊，不知道从哪里开始', value: 'A3', score: { ActionScore: 2 } },
+      { text: '感到迷茫，也逃避去认真面对', value: 'A4', score: { ActionScore: 3 } },
+    ]
+  },
+  {
+    phase: 2,
+    type: 'scale',
+    dimension: 'Anxiety_Worth',
+    text: '我常常觉得自己的能力或经历不足以应对职场竞争',
+    scaleLabels: ['完全不符合', '完全符合'],
+  },
+  {
+    phase: 2,
+    type: 'choice',
+    dimension: 'Anxiety_Source',
+    text: '你的就业焦虑主要来自哪里？（选最符合的一项）',
+    options: [
+      { text: '就业市场竞争太激烈，行情不好', value: 'S1', score: { AnxSource: 'market' } },
+      { text: '不清楚自己想要什么，方向迷失', value: 'S2', score: { AnxSource: 'direction' } },
+      { text: '家庭期望与自身想法有冲突', value: 'S3', score: { AnxSource: 'family' } },
+      { text: '担心自己能力不足，缺乏竞争力', value: 'S4', score: { AnxSource: 'ability' } },
+    ]
+  },
+  {
+    phase: 2,
+    type: 'scale',
+    dimension: 'Anxiety_Sleep',
+    text: '就业相关的担忧会影响我的睡眠或日常情绪',
+    scaleLabels: ['从不', '经常'],
+  },
+];
+
+const PHASES = [
+  { name: '第一章：性格探索', desc: '了解你的行为倾向与思维方式', icon: '🌱', range: [0, 8] },
+  { name: '第二章：就业焦虑', desc: '评估你的就业压力与心理状态', icon: '🌊', range: [9, 14] },
+];
+
+const PERSONALITY_TYPES = {
+  'ENTJ': { name: '战略统帅', en: 'The Commander', quote: '天生的领导者，目光长远，执行力强。擅长在复杂局面中找到最优路径，天然适合管理、创业或战略类岗位。', traits: ['领导力强', '逻辑清晰', '目标导向', '决策果断'], careers: ['管理培训生', '咨询顾问', '创业方向', '战略规划'] },
+  'INTJ': { name: '独立策划家', en: 'The Architect', quote: '独立思考，不随波逐流。对自己有极高标准，喜欢深度研究和精心设计系统性方案。', traits: ['独立自主', '深度思考', '完美主义', '战略眼光'], careers: ['研究员', '数据分析', '产品经理', '技术专家'] },
+  'ENFP': { name: '热情探索者', en: 'The Campaigner', quote: '充满创意与热情，善于激发他人，对未知充满好奇。在创意、传播或教育领域如鱼得水。', traits: ['创造力强', '善于沟通', '充满热情', '富有同理心'], careers: ['市场营销', '内容创作', '教育培训', '公关传播'] },
+  'INFP': { name: '理想守护者', en: 'The Mediator', quote: '内心世界丰富，有强烈的价值观，追求意义感。在艺术、心理、社会工作等领域最能发光。', traits: ['价值驱动', '创意敏感', '同理心深', '追求真实'], careers: ['心理咨询', '文字工作', '艺术设计', 'NGO/公益'] },
+  'ESTJ': { name: '可靠执行者', en: 'The Executive', quote: '高度负责、条理清晰，重视规则与效率。天然擅长管理流程、把控质量，是团队的压舱石。', traits: ['责任心强', '组织能力', '务实高效', '重视规则'], careers: ['行政管理', '财务会计', '工程监管', '传统行业管理'] },
+  'ISFJ': { name: '温暖守护者', en: 'The Defender', quote: '细心体贴，默默奉献。对他人需求高度敏感，在需要稳定、耐心和责任感的岗位上表现出色。', traits: ['体贴入微', '忠诚可靠', '注重细节', '稳定耐心'], careers: ['医护行业', '教育老师', '人力资源', '客户服务'] },
+  'ENTP': { name: '辩才创变者', en: 'The Debater', quote: '思维活跃，喜欢挑战常规，善于发现系统漏洞。在需要创新、辩论和快速迭代的环境中最为耀眼。', traits: ['思维敏捷', '善于辩论', '富有创新', '适应变化'], careers: ['产品创新', '法律谈判', '投资分析', '科技创业'] },
+  'ISTP': { name: '冷静技术家', en: 'The Virtuoso', quote: '擅长独立解决实际问题，动手能力强，不喜欢繁复的人际规则，专注于做好眼前的事。', traits: ['逻辑冷静', '动手能力', '独立专注', '观察细致'], careers: ['技术开发', '工程师', '数据科学', '设计师'] },
+};
+
+// =====================================================
+// STATE
+// =====================================================
+let currentQ = 0;
+let answers = {};
+let scores = {
+  E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0,
+  R: 0, Openness: 0, Conscientiousness: 0,
+  Stable: 0, Growth: 0, Leader: 0, Creative: 0,
+  AnxietyTotal: 0, ActionScore: 0, AnxSource: '',
+  AnxFuture: 0, AnxCompete: 0, AnxWorth: 0, AnxSleep: 0,
+};
+
+// =====================================================
+// CORE FUNCTIONS
+// =====================================================
+
+function startGame() {
+  document.getElementById('introPage').classList.add('hidden');
+  document.getElementById('gamePage').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const area = document.getElementById('questionArea');
+
+  // Update phase header
+  const phase = PHASES.find(p => currentQ >= p.range[0] && currentQ <= p.range[1]);
+  if (phase) {
+    document.getElementById('phaseName').textContent = phase.name;
+    document.getElementById('phaseDesc').textContent = phase.desc;
+    document.getElementById('phaseHeader').querySelector('.phase-icon').textContent = phase.icon;
+  }
+
+  // Update progress
+  const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${currentQ} / ${QUESTIONS.length}`;
+
+  // Render question
+  let html = `<div class="question-card">
+    <div class="question-number">题目 ${String(currentQ + 1).padStart(2, '0')} · ${q.phase === 1 ? '性格探索' : '就业焦虑'}</div>
+    <div class="question-text">${q.text}</div>`;
+
+  if (q.type === 'choice') {
+    html += `<div class="options-grid">`;
+    q.options.forEach((opt, i) => {
+      const markers = ['A', 'B', 'C', 'D'];
+      const selected = answers[currentQ] === i ? 'selected' : '';
+      html += `<button class="option-btn ${selected}" onclick="selectOption(${i})">
+        <span class="opt-marker">${markers[i]}</span>
+        <span>${opt.text}</span>
+      </button>`;
+    });
+    html += `</div>`;
+  } else if (q.type === 'scale') {
+    const savedVal = answers[currentQ];
+    html += `<div class="scale-wrap">
+      <span class="scale-label">${q.scaleLabels[0]}</span>
+      <div class="scale-btns">`;
+    for (let v = 1; v <= 5; v++) {
+      const sel = savedVal === v ? 'selected' : '';
+      html += `<button class="scale-btn ${sel}" onclick="selectScale(${v})">${v}</button>`;
+    }
+    html += `</div><span class="scale-label">${q.scaleLabels[1]}</span></div>`;
+  }
+
+  html += `</div>`;
+  area.innerHTML = html;
+  area.style.animation = 'none';
+  area.offsetHeight;
+  area.style.animation = 'slideUp 0.4s ease both';
+
+  // Update nav buttons
+  document.getElementById('prevBtn').style.display = currentQ === 0 ? 'none' : 'inline-block';
+  document.getElementById('nextBtn').textContent = currentQ === QUESTIONS.length - 1 ? '查看结果 ✦' : '下一题 →';
+  document.getElementById('nextBtn').disabled = answers[currentQ] === undefined;
+}
+
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function selectScale(val) {
+  answers[currentQ] = val;
+  document.querySelectorAll('.scale-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i + 1 === val);
+  });
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function navigate(dir) {
+  if (dir === 1) {
+    if (currentQ === QUESTIONS.length - 1) {
+      calculateResults();
+      return;
+    }
+    currentQ++;
+  } else {
+    currentQ = Math.max(0, currentQ - 1);
+  }
+  renderQuestion();
+}
+
+// =====================================================
+// CALCULATE RESULTS
+// =====================================================
+function calculateResults() {
+  // Reset
+  Object.keys(scores).forEach(k => { if (typeof scores[k] === 'number') scores[k] = 0; });
+
+  QUESTIONS.forEach((q, idx) => {
+    const ans = answers[idx];
+    if (ans === undefined) return;
+
+    if (q.type === 'choice') {
+      const opt = q.options[ans];
+      Object.entries(opt.score).forEach(([k, v]) => {
+        if (k === 'AnxSource') scores.AnxSource = v;
+        else if (typeof scores[k] === 'number') scores[k] += v;
+      });
+    } else if (q.type === 'scale') {
+      const val = ans; // 1-5
+      const dim = q.dimension;
+      if (dim === 'Openness') scores.Openness = val;
+      else if (dim === 'Conscientiousness') scores.Conscientiousness = val;
+      else if (dim === 'Anxiety_Future') scores.AnxFuture = val;
+      else if (dim === 'Anxiety_Compete') scores.AnxCompete = val;
+      else if (dim === 'Anxiety_Worth') scores.AnxWorth = val;
+      else if (dim === 'Anxiety_Sleep') scores.AnxSleep = val;
+    }
+  });
+
+  // Determine MBTI-like type
+  const E = scores.E >= scores.I ? 'E' : 'I';
+  const S = scores.S >= scores.N ? 'S' : 'N';
+  const T = scores.T >= scores.F ? 'T' : 'F';
+  const J = scores.J >= scores.P ? 'J' : 'P';
+  const mbti = E + (S === 'S' ? 'S' : 'N') + T + J;
+
+  // Anxiety score (0-100)
+  const anxRaw = scores.AnxFuture + scores.AnxCompete + scores.AnxWorth + scores.AnxSleep + scores.ActionScore;
+  const anxMax = 5 + 5 + 5 + 5 + 3;
+  const anxScore = Math.round((anxRaw / anxMax) * 100);
+
+  showResult(mbti, anxScore);
+}
+
+// =====================================================
+// SHOW RESULT
+// =====================================================
+function showResult(mbti, anxScore) {
+  document.getElementById('gamePage').classList.add('hidden');
+  const resultPage = document.getElementById('resultPage');
+  resultPage.classList.remove('hidden');
+
+  const type = PERSONALITY_TYPES[mbti] || PERSONALITY_TYPES['ENTP'];
+  const anxLevel = getAnxLevel(anxScore);
+  const adviceList = getAdvice(anxScore, mbti, scores.AnxSource);
+
+  // Radar data
+  const radarData = [
+    { label: '开放性', val: scores.Openness || 3 },
+    { label: '尽责性', val: scores.Conscientiousness || 3 },
+    { label: '社交性', val: (scores.E / Math.max(scores.E + scores.I, 1)) * 5 || 2.5 },
+    { label: '韧性', val: Math.min(5, Math.max(1, 3 + scores.R)) },
+    { label: '创新力', val: (scores.N / Math.max(scores.N + scores.S, 1)) * 5 || 2.5 },
+  ];
+
+  resultPage.innerHTML = `
+    <div class="header" style="margin-bottom:28px">
+      <div class="header-badge">测评结果</div>
+      <h1>你的<span>职途星盘</span></h1>
+    </div>
+
+    <div class="result-hero" data-char="${type.name[0]}">
+      <div class="result-type-label">✦ 你的性格类型 · ${mbti} ✦</div>
+      <div class="result-type-name">${type.name}</div>
+      <div class="result-type-en">${type.en}</div>
+      <div class="result-quote">${type.quote}</div>
+    </div>
+
+    <div class="radar-wrap">
+      <div class="radar-title">性格维度雷达图</div>
+      <canvas id="radarChart" width="280" height="280"></canvas>
+    </div>
+
+    <div class="anxiety-meter">
+      <div class="result-card-title">就业焦虑指数</div>
+      <div class="anxiety-score-display">
+        <span class="anxiety-score-num" id="anxNumDisplay">0</span>
+        <span class="anxiety-score-unit">/ 100</span>
+        <span style="margin-left:12px;padding:2px 12px;background:${anxLevel.bg};color:${anxLevel.color};font-size:12px;font-family:'Noto Serif SC',serif;letter-spacing:2px">${anxLevel.label}</span>
+      </div>
+      <div class="anxiety-bar-track">
+        <div class="anxiety-bar-fill" id="anxBar" style="width:0%;background:${anxLevel.barColor}"></div>
+      </div>
+      <div class="anxiety-labels">
+        <span>轻松自在</span><span>适度紧张</span><span>压力较大</span><span>高度焦虑</span>
+      </div>
+      <p style="margin-top:16px;font-size:13px;color:#666;line-height:1.7">${anxLevel.desc}</p>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="result-card-title">性格标签</div>
+        <div class="tag-list">
+          ${type.traits.map(t => `<span class="tag tag-teal">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-card-title">适合方向</div>
+        <div class="tag-list">
+          ${type.careers.map(c => `<span class="tag tag-gold">${c}</span>`).join('')}
+        </div>
+      </div>
+      <div class="result-card" style="grid-column:1/-1">
+        <div class="result-card-title">个性化建议</div>
+        <ul class="advice-list">
+          ${adviceList.map(a => `<li>${a}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-outline" onclick="restartGame()">重新测评</button>
+      <button class="btn btn-primary" onclick="copyResult('${type.name}', '${mbti}', ${anxScore})">复制结果分享</button>
+    </div>
+  `;
+
+  // Animate anxiety counter
+  setTimeout(() => {
+    document.getElementById('anxBar').style.width = anxScore + '%';
+    animateNum('anxNumDisplay', 0, anxScore, 1200);
+  }, 400);
+
+  // Draw radar
+  setTimeout(() => drawRadar(radarData), 500);
+}
+
+function getAnxLevel(score) {
+  if (score < 25) return {
+    label: '从容型', color: '#2d7d7d', bg: 'rgba(45,125,125,0.1)', barColor: '#2d7d7d',
+    desc: '你对就业的心态相当平和，焦虑感较低。这通常意味着你对自己有清晰认知，或已做好充分准备。继续保持这种从容的状态，同时也别忘了持续探索机会。'
+  };
+  if (score < 50) return {
+    label: '紧张型', color: '#d4a853', bg: 'rgba(212,168,83,0.1)', barColor: '#d4a853',
+    desc: '你有一定的就业焦虑，这是大多数同学的正常状态。适度的紧张感能推动你行动，但注意别让焦虑演变成逃避。建议制定具体的行动计划，化焦虑为动力。'
+  };
+  if (score < 75) return {
+    label: '压力型', color: '#c84b31', bg: 'rgba(200,75,49,0.1)', barColor: '#c84b31',
+    desc: '你的就业焦虑处于中高水平，可能已经影响到日常状态。建议关注自己的情绪管理，同时寻求导师、职业规划师或朋辈的支持。把大目标拆解成小步骤，每天推进一点点。'
+  };
+  return {
+    label: '高焦虑型', color: '#8b1a1a', bg: 'rgba(139,26,26,0.1)', barColor: '#8b1a1a',
+    desc: '你目前承受着较高的就业焦虑，这需要认真对待。高焦虑可能源于多方面压力叠加。建议先照顾好自身身心健康，主动寻求学校心理咨询或职业辅导服务，不要独自承受。'
+  };
+}
+
+function getAdvice(anxScore, mbti, anxSource) {
+  const base = [];
+  if (anxScore >= 50) {
+    base.push('每天留出15分钟"焦虑时间"，集中写下担忧，其余时间专注于行动，避免焦虑蔓延至全天。');
+  }
+  const srcAdvice = {
+    'market': '市场竞争激烈是客观现实，但细分赛道仍有大量机会。建议深耕一个垂直方向，成为某领域的专才而非全才。',
+    'direction': '方向迷茫时，先从"排除法"入手——列出你绝对不想做的事，剩余的范围往往就是值得探索的方向。',
+    'family': '与家人的期望冲突时，建议用数据说话，搜集目标职业的发展路径和薪资数据，理性沟通，而非单纯争辩。',
+    'ability': '能力焦虑通常高估了"准备好"的标准。大多数人都在"70分"时起步，剩下的30分在实践中学。',
+  };
+  if (anxSource && srcAdvice[anxSource]) base.push(srcAdvice[anxSource]);
+
+  const mbtiAdvice = {
+    E: '充分利用你的社交优势，主动拓展人脉网络，很多机会来自人际连接而非简历投递。',
+    I: '深度胜过广度是你的优势。针对2-3家心仪企业深入研究，写出有针对性的求职材料，效果远好于广撒网。',
+    N: '你善于发现趋势和可能性，不妨关注新兴行业和岗位，未来的职位有些现在还没被定义。',
+    S: '你对细节和实操的把握是职场竞争力，在简历和面试中多呈现具体案例和量化成果。',
+    T: '在技术和逻辑分析类岗位上你有天然优势，同时也可以适当培养在团队沟通中的温度感。',
+    F: '你的同理心和对人际关系的敏感度在服务业、教育、管理等领域非常宝贵，要将其转化为职场语言。',
+  };
+  const firstLetter = mbti[0];
+  const thirdLetter = mbti[2];
+  if (mbtiAdvice[firstLetter]) base.push(mbtiAdvice[firstLetter]);
+  if (mbtiAdvice[thirdLetter]) base.push(mbtiAdvice[thirdLetter]);
+
+  base.push('建立"实习/项目经历数据库"：用STAR法则（情境、任务、行动、结果）整理每段经历，面试时调取自如。');
+
+  return base.slice(0, 4);
+}
+
+function animateNum(id, from, to, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = Date.now();
+  const tick = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(from + (to - from) * ease);
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function drawRadar(data) {
+  const canvas = document.getElementById('radarChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 140, cy = 140, r = 100;
+  const n = data.length;
+  const angleStep = (2 * Math.PI) / n;
+
+  ctx.clearRect(0, 0, 280, 280);
+
+  // Grid rings
+  for (let ring = 1; ring <= 5; ring++) {
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const angle = i * angleStep - Math.PI / 2;
+      const pr = (ring / 5) * r;
+      const x = cx + pr * Math.cos(angle);
+      const y = cy + pr * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(212,168,83,0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Spokes
+  for (let i = 0; i < n; i++) {
+    const angle = i * angleStep - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+    ctx.strokeStyle = 'rgba(212,168,83,0.15)';
+    ctx.stroke();
+  }
+
+  // Data polygon (animated)
+  let progress = 0;
+  const animate = () => {
+    progress = Math.min(progress + 0.04, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+
+    // Clear and redraw
+    ctx.clearRect(0, 0, 280, 280);
+
+    // Rings
+    for (let ring = 1; ring <= 5; ring++) {
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const pr = (ring / 5) * r;
+        i === 0 ? ctx.moveTo(cx + pr * Math.cos(angle), cy + pr * Math.sin(angle))
+                : ctx.lineTo(cx + pr * Math.cos(angle), cy + pr * Math.sin(angle));
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(212,168,83,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+    for (let i = 0; i < n; i++) {
+      const angle = i * angleStep - Math.PI / 2;
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+      ctx.strokeStyle = 'rgba(212,168,83,0.15)'; ctx.stroke();
+    }
+
+    // Data
+    ctx.beginPath();
+    data.forEach((d, i) => {
+      const angle = i * angleStep - Math.PI / 2;
+      const pr = (d.val / 5) * r * ease;
+      i === 0 ? ctx.moveTo(cx + pr * Math.cos(angle), cy + pr * Math.sin(angle))
+              : ctx.lineTo(cx + pr * Math.cos(angle), cy + pr * Math.sin(angle));
+    });
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(45,125,125,0.2)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(45,125,125,0.8)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Points
+    data.forEach((d, i) => {
+      const angle = i * angleStep - Math.PI / 2;
+      const pr = (d.val / 5) * r * ease;
+      ctx.beginPath();
+      ctx.arc(cx + pr * Math.cos(angle), cy + pr * Math.sin(angle), 4, 0, 2 * Math.PI);
+      ctx.fillStyle = '#2d7d7d'; ctx.fill();
+    });
+
+    // Labels
+    data.forEach((d, i) => {
+      const angle = i * angleStep - Math.PI / 2;
+      const pr = r + 22;
+      const lx = cx + pr * Math.cos(angle);
+      const ly = cy + pr * Math.sin(angle);
+      ctx.font = '12px "Noto Sans SC", sans-serif';
+      ctx.fillStyle = '#888';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(d.label, lx, ly);
+    });
+
+    if (progress < 1) requestAnimationFrame(animate);
+  };
+  animate();
+}
+
+function restartGame() {
+  currentQ = 0;
+  answers = {};
+  Object.keys(scores).forEach(k => { if (typeof scores[k] === 'number') scores[k] = 0; });
+  scores.AnxSource = '';
+
+  document.getElementById('resultPage').classList.add('hidden');
+  document.getElementById('introPage').classList.remove('hidden');
+  document.getElementById('introPage').style.animation = 'none';
+  document.getElementById('introPage').offsetHeight;
+  document.getElementById('introPage').style.animation = 'fadeIn 0.6s ease both';
+}
+
+function copyResult(typeName, mbti, anxScore) {
+  const text = `【职途星盘测评结果】\n性格类型：${typeName}（${mbti}）\n就业焦虑指数：${anxScore}/100\n\n快来测测你的职途密码 →`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => alert('结果已复制，快去分享给朋友吧！'));
+  } else {
+    alert(text);
+  }
+}
+</script>
+</body>
+</html>
